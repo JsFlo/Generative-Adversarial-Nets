@@ -26,9 +26,10 @@ disc_biases = {
     'bc1': bias_variable([32]),
     'bc2': bias_variable([64]),
     'bc3': weight_variable([128]),
+    'reshape': (3 * 3 * 128),
     'bf1': weight_variable([1024]),
     'bf2': weight_variable([512]),
-    'bout': weight_variable([10])
+    'bout': weight_variable([1])
 }
 
 
@@ -78,7 +79,7 @@ def getDisc(x, keep_prob):
     conv2 = getHiddenLayer(conv1, disc_weights['wc2'], disc_biases['bc2'])
     conv3 = getHiddenLayer(conv2, disc_weights['wc3'], disc_biases['bc3'])
     # flatten 3 to go into fully connected
-    conv3_flattened = tf.reshape(conv3, [-1, 3 * 3 * 128])
+    conv3_flattened = tf.reshape(conv3, [-1, disc_biases['reshape']])
     # fully connected 1 with dropout
     fullyConnected1 = getFullyConnectedLayer(conv3_flattened, disc_weights['wf1'], disc_biases['bf1'])
     fullyConnected1_dropout = tf.nn.dropout(fullyConnected1, keep_prob)
