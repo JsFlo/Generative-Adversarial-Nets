@@ -19,7 +19,7 @@ disc_weights = {  # 28 x 28 x 1
     'wc3': weight_variable([2, 2, 64, 128]),  # 3 x 3 x 128 (= 1152 after flatten)
     'wf1': weight_variable([3 * 3 * 128, 1024]),  # 1152 -> 1024
     'wf2': weight_variable([1024, 512]),  # 1024 -> 512
-    'out': weight_variable([512, 1])  # 512 -> 1
+    'out': weight_variable([512, 10])  # 512 -> 1
 }
 
 disc_biases = {
@@ -29,7 +29,7 @@ disc_biases = {
     'reshape': (3 * 3 * 128),
     'bf1': weight_variable([1024]),
     'bf2': weight_variable([512]),
-    'bout': weight_variable([1])
+    'bout': weight_variable([10])
 }
 
 
@@ -73,20 +73,20 @@ def printShape(tensor):
 
 
 # expects x to be of shape 28 x 28
-def getDisc(x, keep_prob):
+def getCNN(x, keep_prob, weights, bias):
     # 3 hidden layers
-    conv1 = getHiddenLayer(x, disc_weights['wc1'], disc_biases['bc1'])
-    conv2 = getHiddenLayer(conv1, disc_weights['wc2'], disc_biases['bc2'])
-    conv3 = getHiddenLayer(conv2, disc_weights['wc3'], disc_biases['bc3'])
+    conv1 = getHiddenLayer(x, weights['wc1'], bias['bc1'])
+    conv2 = getHiddenLayer(conv1, weights['wc2'], bias['bc2'])
+    conv3 = getHiddenLayer(conv2, weights['wc3'], bias['bc3'])
     # flatten 3 to go into fully connected
-    conv3_flattened = tf.reshape(conv3, [-1, disc_biases['reshape']])
+    conv3_flattened = tf.reshape(conv3, [-1, bias['reshape']])
     # fully connected 1 with dropout
-    fullyConnected1 = getFullyConnectedLayer(conv3_flattened, disc_weights['wf1'], disc_biases['bf1'])
+    fullyConnected1 = getFullyConnectedLayer(conv3_flattened, weights['wf1'], bias['bf1'])
     fullyConnected1_dropout = tf.nn.dropout(fullyConnected1, keep_prob)
     # fully connected 2
-    fullyConnected2 = getFullyConnectedLayer(fullyConnected1_dropout, disc_weights['wf2'], disc_biases['bf2'])
+    fullyConnected2 = getFullyConnectedLayer(fullyConnected1_dropout, weights['wf2'], bias['bf2'])
     # fully connected 3 no relu applied
-    return getFullyConnectedLayer(fullyConnected2, disc_weights['out'], disc_biases['bout'], False)
+    return getFullyConnectedLayer(fullyConnected2, weights['out'], bias['bout'], False)
 
 
 def main():
@@ -104,8 +104,8 @@ def main():
     yCorrectLabels = tf.placeholder(tf.float32, shape=[None, 10])
 
     # used for dropout later, hold a ref so we can remove it during testing
-    keep_prob = tf.placeholder(tf.float32)
-    yModel = getDisc(x_image, keep_prob)
+    disc_keep_prob = tf.placeholder(tf.float32)
+    yModel = getCNN(x_image, disc_keep_prob, disc_weights, disc_biases)
     # softmax and reduce mean
     cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=yCorrectLabels, logits=yModel))
 
@@ -118,13 +118,13 @@ def main():
         for i in range(10):
             batch = mnist.train.next_batch(50)
             if i % 25 == 0:
-                printAccuracy(accuracy, i, x, yCorrectLabels, batch[0], batch[1], keep_prob)
+                printAccuracy(accuracy, i, x, yCorrectLabels, batch[0], batch[1], disc_keep_prob)
 
-            train_step.run(feed_dict={x: batch[0], yCorrectLabels: batch[1], keep_prob: 0.5})
+            train_step.run(feed_dict={x: batch[0], yCorrectLabels: batch[1], disc_keep_prob: 0.5})
 
         print(
             'test accuracy %g' % accuracy.eval(
-                feed_dict={x: mnist.test.images, yCorrectLabels: mnist.test.labels, keep_prob: 1.0}))
+                feed_dict={x: mnist.test.images, yCorrectLabels: mnist.test.labels, disc_keep_prob: 1.0}))
 
 
 main()
