@@ -12,16 +12,17 @@ def bias_variable(shape):
     return tf.Variable(initial)
 
 
-weights = {  # 28 x 28 x 1
+# takes in a 28 x 28 x 1 and outputs a 1(real) or a 0(fake)
+disc_weights = {  # 28 x 28 x 1
     'wc1': weight_variable([2, 2, 1, 32]),  # 14 x 14 x 32
     'wc2': weight_variable([3, 3, 32, 64]),  # 6 x 6 x 64
     'wc3': weight_variable([2, 2, 64, 128]),  # 3 x 3 x 128 (= 1152 after flatten)
     'wf1': weight_variable([3 * 3 * 128, 1024]),  # 1152 -> 1024
     'wf2': weight_variable([1024, 512]),  # 1024 -> 512
-    'out': weight_variable([512, 10])  # 512 -> 10
+    'out': weight_variable([512, 1])  # 512 -> 1
 }
 
-biases = {
+disc_biases = {
     'bc1': bias_variable([32]),
     'bc2': bias_variable([64]),
     'bc3': weight_variable([128]),
@@ -71,20 +72,20 @@ def printShape(tensor):
 
 
 # expects x to be of shape 28 x 28
-def buildModel(x, keep_prob):
+def getDisc(x, keep_prob):
     # 3 hidden layers
-    conv1 = getHiddenLayer(x, weights['wc1'], biases['bc1'])
-    conv2 = getHiddenLayer(conv1, weights['wc2'], biases['bc2'])
-    conv3 = getHiddenLayer(conv2, weights['wc3'], biases['bc3'])
+    conv1 = getHiddenLayer(x, disc_weights['wc1'], disc_biases['bc1'])
+    conv2 = getHiddenLayer(conv1, disc_weights['wc2'], disc_biases['bc2'])
+    conv3 = getHiddenLayer(conv2, disc_weights['wc3'], disc_biases['bc3'])
     # flatten 3 to go into fully connected
     conv3_flattened = tf.reshape(conv3, [-1, 3 * 3 * 128])
     # fully connected 1 with dropout
-    fullyConnected1 = getFullyConnectedLayer(conv3_flattened, weights['wf1'], biases['bf1'])
+    fullyConnected1 = getFullyConnectedLayer(conv3_flattened, disc_weights['wf1'], disc_biases['bf1'])
     fullyConnected1_dropout = tf.nn.dropout(fullyConnected1, keep_prob)
     # fully connected 2
-    fullyConnected2 = getFullyConnectedLayer(fullyConnected1_dropout, weights['wf2'], biases['bf2'])
+    fullyConnected2 = getFullyConnectedLayer(fullyConnected1_dropout, disc_weights['wf2'], disc_biases['bf2'])
     # fully connected 3 no relu applied
-    return getFullyConnectedLayer(fullyConnected2, weights['out'], biases['bout'], False)
+    return getFullyConnectedLayer(fullyConnected2, disc_weights['out'], disc_biases['bout'], False)
 
 
 def main():
@@ -103,7 +104,7 @@ def main():
 
     # used for dropout later, hold a ref so we can remove it during testing
     keep_prob = tf.placeholder(tf.float32)
-    yModel = buildModel(x_image, keep_prob)
+    yModel = getDisc(x_image, keep_prob)
     # softmax and reduce mean
     cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=yCorrectLabels, logits=yModel))
 
