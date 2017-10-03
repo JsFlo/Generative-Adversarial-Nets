@@ -32,7 +32,17 @@ caused a lot of problems with trying to pigeonhole that architecture to work wit
 * fullyConnected1 -> relu ->
 * fullyConnected2 -> relu -> 
 * fullyConnected3 ->
-![generated gan output](gan_generated.gif)
-100 random numbers -> Generator -> ImageOutput -> Discriminator -> (Real|Fake) 
 
+100 random numbers -> Generator -> ImageOutput -> Discriminator -> (Real|Fake)
+
+
+![generated gan output](gan_generated.gif) 
+
+![](init.png)
+![](two.png)
+![](two1.png)
+![](three.png)
+![](weird.png)
+![](weird2.png)
+![](weird3.png)
 
