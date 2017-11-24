@@ -5,25 +5,29 @@ import tensorflow as tf
 import discriminator
 import generator
 import trainer
+import utils
 
-slim = tf.contrib.slim
-version = '0.1'
+VERSION = '0.2'
 
-# 100 RANDOM NUMBERS
-GEN_INPUT_DIM = 100
-HEIGHT, WIDTH, CHANNEL = 128, 128, 3
-BATCH_SIZE = 64
-EPOCH = 1
-
-MODEL_PATH = './model/'
-OUTPUT_IMAGES_PATH = './' + version
+OUTPUT_MODEL_PATH = './model/' + VERSION
+OUTPUT_IMAGES_PATH = './images/' + VERSION
 
 DEBUG_PRINT_FREQ = 1
 SAVE_MODEL_FREQ = 1
 SAVE_IMAGES_FREQ = 1
 
+# 100 RANDOM NUMBERS
+GEN_INPUT_DIM = 100
+# 128 X 128 AND RGB (3)
+# ^ size of generator output & the images that will be coming in will be resized to that
+HEIGHT, WIDTH, CHANNEL = 128, 128, 3
+
+TRAIN_BATCH_SIZE = 64
+TRAIN_NUM_EPOCHS = 1
 TRAIN_DISC_PER_BATCH = 1
 TRAIN_GEN_PER_BATCH = 1
+
+slim = tf.contrib.slim
 
 
 # go into leaky
@@ -35,12 +39,12 @@ def create_dirs_if_not_exists(path):
 
 
 def get_train_noise():
-    return np.random.uniform(-1.0, 1.0, size=[BATCH_SIZE, GEN_INPUT_DIM]).astype(np.float32)
+    return np.random.uniform(-1.0, 1.0, size=[TRAIN_BATCH_SIZE, GEN_INPUT_DIM]).astype(np.float32)
 
 
-def save_model(saver, sess, version, epoch_counter):
-    create_dirs_if_not_exists(MODEL_PATH + version)
-    fileName = MODEL_PATH + version + '/' + str(epoch_counter)
+def save_model(saver, sess, epoch_counter):
+    create_dirs_if_not_exists(OUTPUT_MODEL_PATH)
+    fileName = OUTPUT_MODEL_PATH + '/' + str(epoch_counter)
     saver.save(sess, fileName)
 
 
@@ -49,7 +53,7 @@ def save_images(sess, fake_image, random_input, is_train, epoch_counter):
     sample_noise = get_train_noise()
     imgtest = sess.run(fake_image, feed_dict={random_input: sample_noise, is_train: False})
     fileName = OUTPUT_IMAGES_PATH + '/epoch' + str(epoch_counter) + '.jpg'
-    # save_images(imgtest, [8, 8], OUTPUT_IMAGES_PATH+ '/epoch' + str(i) + '.jpg')
+    utils.save_images(imgtest, [8, 8], fileName)
 
 
 def train():
@@ -82,8 +86,8 @@ def train():
     # clip discriminator weights
     d_clip = [v.assign(tf.clip_by_value(v, -0.01, 0.01)) for v in d_vars]
 
-    image_batch, samples_num = trainer.get_training_image_batch(HEIGHT, WIDTH, BATCH_SIZE)
-    batch_num = int(samples_num / BATCH_SIZE)
+    image_batch, samples_num = trainer.get_training_image_batch(HEIGHT, WIDTH, TRAIN_BATCH_SIZE)
+    batch_num = int(samples_num / TRAIN_BATCH_SIZE)
 
     # sess init
     sess = tf.Session()
@@ -93,13 +97,13 @@ def train():
 
     # quick save
     save_path = saver.save(sess, "/tmp/model.ckpt")
-    ckpt = tf.train.latest_checkpoint('./model/' + version)
+    ckpt = tf.train.latest_checkpoint('./model/' + VERSION)
     saver.restore(sess, save_path)
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     print('Training samples:{}'.format(samples_num))
-    for epoch_counter in range(EPOCH):
+    for epoch_counter in range(TRAIN_NUM_EPOCHS):
         print("epoch: {}".format(epoch_counter))
 
         # BATCH TRAINING
@@ -130,9 +134,9 @@ def train():
         if epoch_counter % SAVE_IMAGES_FREQ == 0:
             save_images(sess, fake_image, random_input, is_train, epoch_counter)
 
-        # save every now and then
+        # save model every now and then
         if epoch_counter % SAVE_MODEL_FREQ == 0:
-            save_model(saver, sess, version, epoch_counter)
+            save_model(saver, sess, epoch_counter)
 
     coord.request_stop()
     coord.join(threads)
