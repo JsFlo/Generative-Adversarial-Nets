@@ -38,11 +38,11 @@ caused a lot of problems with trying to pigeonhole that architecture to work wit
 
 ![generated gan output](gan_generated.gif) 
 
-![](init.png)
-![](two.png)
-![](two1.png)
-![](three.png)
-![](weird.png)
-![](weird2.png)
-![](weird3.png)
+![](images/init.png)
+![](images/two.png)
+![](images/two1.png)
+![](images/three.png)
+![](images/weird.png)
+![](images/weird2.png)
+![](images/weird3.png)
 
