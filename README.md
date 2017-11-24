@@ -36,7 +36,7 @@ caused a lot of problems with trying to pigeonhole that architecture to work wit
 100 random numbers -> Generator -> ImageOutput -> Discriminator -> (Real|Fake)
 
 
-![generated gan output](gan_generated.gif) 
+![generated gan output](images/gan_generated.gif) 
 
 ![](images/init.png)
 ![](images/two.png)
