@@ -7,10 +7,12 @@ import generator
 import trainer
 import utils
 
-VERSION = '0.2'
+VERSION = '0.7'
 
 OUTPUT_MODEL_PATH = './model/' + VERSION
 OUTPUT_IMAGES_PATH = './images/' + VERSION
+# 0 = stack images on top of each other, 1 = stack them side to side
+OUTPUT_IMAGES_STACK_AXIS = 0
 
 DEBUG_PRINT_FREQ = 1
 SAVE_MODEL_FREQ = 1
@@ -22,7 +24,7 @@ GEN_INPUT_DIM = 100
 # ^ size of generator output & the images that will be coming in will be resized to that
 HEIGHT, WIDTH, CHANNEL = 128, 128, 3
 
-TRAIN_BATCH_SIZE = 64
+TRAIN_BATCH_SIZE = 5
 TRAIN_NUM_EPOCHS = 1
 TRAIN_DISC_PER_BATCH = 1
 TRAIN_GEN_PER_BATCH = 1
@@ -53,7 +55,7 @@ def save_images(sess, fake_image, random_input, is_train, epoch_counter):
     sample_noise = get_train_noise()
     imgtest = sess.run(fake_image, feed_dict={random_input: sample_noise, is_train: False})
     fileName = OUTPUT_IMAGES_PATH + '/epoch' + str(epoch_counter) + '.jpg'
-    utils.save_images(imgtest, [8, 8], fileName)
+    utils.save_images(imgtest, OUTPUT_IMAGES_STACK_AXIS, fileName)
 
 
 def train():
