@@ -57,15 +57,13 @@ def save_images(sess, fake_image, random_input, is_train, epoch_counter):
 
 
 def train():
-    gen_input_dim = 100
-
     # PLACEHOLDERS
     real_image = tf.placeholder(tf.float32, shape=[None, HEIGHT, WIDTH, CHANNEL], name='real_image')
-    random_input = tf.placeholder(tf.float32, shape=[None, gen_input_dim], name='rand_input')
+    random_input = tf.placeholder(tf.float32, shape=[None, GEN_INPUT_DIM], name='rand_input')
     is_train = tf.placeholder(tf.bool, name='is_train')
 
     # GENERATOR
-    fake_image = generator.get_generator(random_input, gen_input_dim, output_dim=3, is_train=is_train)
+    fake_image = generator.get_generator(random_input, GEN_INPUT_DIM, output_dim=3, is_train=is_train)
 
     # DISCRIMINATORS
     real_result = discriminator.get_discriminator(real_image, is_train)
