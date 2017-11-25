@@ -7,16 +7,16 @@ import generator
 import trainer
 import utils
 
-VERSION = '0.1'
+VERSION = '0.3'
 
 OUTPUT_MODEL_PATH = './model/' + VERSION
 OUTPUT_IMAGES_PATH = './images/' + VERSION
 # 0 = stack images on top of each other, 1 = stack them side to side
 OUTPUT_IMAGES_STACK_AXIS = 0
 
-DEBUG_PRINT_FREQ = 1000
-SAVE_MODEL_FREQ = 5000
-SAVE_IMAGES_FREQ = 2500
+DEBUG_PRINT_FREQ = 50
+SAVE_MODEL_FREQ = 500
+SAVE_IMAGES_FREQ = 100
 
 # 100 RANDOM NUMBERS
 GEN_INPUT_DIM = 100
@@ -25,7 +25,7 @@ GEN_INPUT_DIM = 100
 HEIGHT, WIDTH, CHANNEL = 128, 128, 3
 
 TRAIN_BATCH_SIZE = 64
-TRAIN_NUM_EPOCHS = 500000
+TRAIN_NUM_EPOCHS = 3000
 TRAIN_DISC_PER_BATCH = 5
 TRAIN_GEN_PER_BATCH = 1
 
@@ -106,7 +106,7 @@ def train():
 
         # BATCH TRAINING
         for batch_counter in range(batch_num):
-            print("batch: {}".format(batch_counter))
+            #print("batch: {}".format(batch_counter))
 
             # GET INPUT (100 RANDOM NOISE)
             train_noise = get_train_noise()
