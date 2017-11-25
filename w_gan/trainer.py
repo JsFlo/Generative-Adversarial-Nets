@@ -23,7 +23,8 @@ def get_training_image_batch(height, width, batch_size,
     images_queue = tf.train.slice_input_producer([all_images])
 
     content = tf.read_file(images_queue[0])
-    image = tf.image.decode_jpeg(content, channels=image_channels)
+    # TODO: make this handle jpeg and png
+    image = tf.image.decode_png(content, channels=image_channels)
     image = tf.image.random_flip_left_right(image)
     image = tf.image.random_brightness(image, max_delta=0.1)
     image = tf.image.random_contrast(image, lower=0.9, upper=1.1)
