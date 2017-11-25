@@ -10,7 +10,7 @@ def save_images(images, stack_axis, image_path):
     inverse_images = (images + 1.) / 2.
     concat_output = concat_images(inverse_images, stack_axis)
     image = np.squeeze(concat_output)
-    return scipy.misc.imsave(image_path, image)
+    return scipy.misc.imsave(image_path, image, "JPEG")
 
 
 def concat_images(images, stack_axis):
