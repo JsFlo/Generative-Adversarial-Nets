@@ -2,12 +2,20 @@ import os
 import numpy as np
 
 import tensorflow as tf
+import argparse
+
 import discriminator
 import generator
 import trainer
 import utils
 
-VERSION = '0.4'
+parser = argparse.ArgumentParser()
+parser.add_argument('--data_dir', type=str, default='data/',
+                    help='Path to images.')
+
+FLAGS = parser.parse_args()
+
+VERSION = '0.4Db2'
 
 OUTPUT_MODEL_PATH = './model/' + VERSION
 OUTPUT_IMAGES_PATH = './images/' + VERSION
@@ -84,7 +92,8 @@ def train():
     # clip discriminator weights
     d_clip = [v.assign(tf.clip_by_value(v, -0.01, 0.01)) for v in d_vars]
 
-    image_batch, samples_num = trainer.get_training_image_batch(HEIGHT, WIDTH, TRAIN_BATCH_SIZE)
+    image_batch, samples_num = trainer.get_training_image_batch(HEIGHT, WIDTH, TRAIN_BATCH_SIZE,
+                                                                data_dir=FLAGS.data_dir)
     batch_num = int(samples_num / TRAIN_BATCH_SIZE)
 
     # sess init
@@ -106,7 +115,7 @@ def train():
 
         # BATCH TRAINING
         for batch_counter in range(batch_num):
-            #print("batch: {}".format(batch_counter))
+            # print("batch: {}".format(batch_counter))
 
             # GET INPUT (100 RANDOM NOISE)
             train_noise = get_train_noise()

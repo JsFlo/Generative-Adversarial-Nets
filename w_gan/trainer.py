@@ -1,13 +1,18 @@
 import os
 import tensorflow as tf
 
+DEFAULT_DIR_NAME = 'data'
 
-def get_training_image_batch(height, width, batch_size, image_channels=3):
+
+def _get_default_dir():
     # get current working dir
     current_dir = os.getcwd()
     # get the path to the 'data' directory
-    data_dir = os.path.join(current_dir, 'data')
+    return os.path.join(current_dir, DEFAULT_DIR_NAME)
 
+
+def get_training_image_batch(height, width, batch_size,
+                             image_channels=3, data_dir=_get_default_dir()):
     # get an array of image paths
     images = []
     for each in os.listdir(data_dir):
