@@ -7,7 +7,7 @@ import generator
 import trainer
 import utils
 
-VERSION = '0.3'
+VERSION = '0.4'
 
 OUTPUT_MODEL_PATH = './model/' + VERSION
 OUTPUT_IMAGES_PATH = './images/' + VERSION
