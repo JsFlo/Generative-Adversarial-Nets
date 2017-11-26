@@ -9,7 +9,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, default='./models/1000',
                     help='Path to model checkpoint.')
-parser.add_argument('--output_path', type=str, default='./out/images/',
+parser.add_argument('--output_path', type=str, default='./inf_out/images/',
                     help='Path to model checkpoint.')
 parser.add_argument('--output_image_columns', type=int, default=4)
 parser.add_argument('--output_num_images', type=int, default=16)
