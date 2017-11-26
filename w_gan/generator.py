@@ -10,22 +10,22 @@ def get_generator(input, input_dim, output_dim, is_train, reuse=False):
             scope.reuse_variables()
         # input is 100 random numbers
         flat_conv1 = _block_1_get_fc(input, input_dim, 4 * 4 * 512)
-        utils.print_shape(flat_conv1)  # (?, 8192)
+        # utils.print_shape(flat_conv1)  # (?, 8192)
         activated_conv1 = _block_2_conv1(is_train, flat_conv1, [-1, 4, 4, 512])
-        utils.print_shape(activated_conv1)  # (?, 4, 4, 512)
+        # utils.print_shape(activated_conv1)  # (?, 4, 4, 512)
         activated_conv2 = _conv_bn_relu(is_train, "conv2", activated_conv1, 256)
-        utils.print_shape(activated_conv2)  # (?, 8, 8, 256)
+        # utils.print_shape(activated_conv2)  # (?, 8, 8, 256)
         activated_conv3 = _conv_bn_relu(is_train, "conv3", activated_conv2, 128)
-        utils.print_shape(activated_conv3)  # (?, 16, 16, 128)
+        # utils.print_shape(activated_conv3)  # (?, 16, 16, 128)
         activated_conv4 = _conv_bn_relu(is_train, "conv4", activated_conv3, 64)
-        utils.print_shape(activated_conv4)  # (?, 32, 32, 64)
+        # utils.print_shape(activated_conv4)  # (?, 32, 32, 64)
         activated_conv5 = _conv_bn_relu(is_train, "conv5", activated_conv4, 32)
-        utils.print_shape(activated_conv5)  # (?, 64, 64, 32)
+        # utils.print_shape(activated_conv5)  # (?, 64, 64, 32)
         conv6 = tf.layers.conv2d_transpose(activated_conv5, output_dim, kernel_size=[5, 5], strides=[2, 2],
                                            padding="SAME",
                                            kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
                                            name='conv6')
-        utils.print_shape(conv6)  # (? 128, 128, 3)
+        # utils.print_shape(conv6)  # (? 128, 128, 3)
         return tf.nn.tanh(conv6, name='act6')
 
 

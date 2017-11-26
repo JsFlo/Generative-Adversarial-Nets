@@ -9,18 +9,23 @@ import generator
 import trainer
 import utils
 
+VERSION = 'DEBUG'
+
 parser = argparse.ArgumentParser()
+# DIRECTORIES
 parser.add_argument('--data_dir', type=str, default='data/',
                     help='Path to images.')
+parser.add_argument('--out_dir', type=str, default='w_gan_out/',
+                    help='Directory to where images and models will be saved')
 
+# MODEL PARAMS
+parser.add_argument('--model_version', type=str, default=VERSION,
+                    help='Used for folders')
 FLAGS = parser.parse_args()
 
-VERSION = '0.4Db2'
-
-OUTPUT_MODEL_PATH = './model/' + VERSION
-OUTPUT_IMAGES_PATH = './images/' + VERSION
-# 0 = stack images on top of each other, 1 = stack them side to side
-OUTPUT_IMAGES_STACK_AXIS = 0
+OUTPUT_MODEL_PATH = FLAGS.out_dir + 'model/' + FLAGS.model_version
+OUTPUT_IMAGES_PATH = FLAGS.out_dir + 'images/' + FLAGS.model_version
+OUTPUT_IMAGE_COLUMNS = 8
 
 DEBUG_PRINT_FREQ = 50
 SAVE_MODEL_FREQ = 500
@@ -32,14 +37,11 @@ GEN_INPUT_DIM = 100
 # ^ size of generator output & the images that will be coming in will be resized to that
 HEIGHT, WIDTH, CHANNEL = 128, 128, 3
 
-TRAIN_BATCH_SIZE = 64
-TRAIN_NUM_EPOCHS = 3000
-TRAIN_DISC_PER_BATCH = 5
+TRAIN_BATCH_SIZE = 8
+TRAIN_NUM_EPOCHS = 1
+TRAIN_DISC_PER_BATCH = 1
 TRAIN_GEN_PER_BATCH = 1
 
-
-# go into leaky
-# go into w-gan
 
 def create_dirs_if_not_exists(path):
     if not os.path.exists(path):
@@ -61,7 +63,7 @@ def save_images(sess, fake_image, random_input, is_train, epoch_counter):
     sample_noise = get_train_noise()
     imgtest = sess.run(fake_image, feed_dict={random_input: sample_noise, is_train: False})
     fileName = OUTPUT_IMAGES_PATH + '/epoch' + str(epoch_counter) + '.jpg'
-    utils.save_images(imgtest, OUTPUT_IMAGES_STACK_AXIS, fileName)
+    utils.save_images(imgtest, fileName, OUTPUT_IMAGE_COLUMNS)
 
 
 def train():
