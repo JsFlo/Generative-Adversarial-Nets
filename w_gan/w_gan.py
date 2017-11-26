@@ -10,6 +10,11 @@ import trainer
 import utils
 
 VERSION = 'DEBUG'
+DEFAULT_TRAIN_NUM_EPOCHS = 1001
+DEFAULT_TRAIN_BATCH_SIZE = 64
+DEFAULT_PRINT_FREQ = 50
+DEFAULT_SAVE_MODEL_FREQ = 500
+DEFAULT_SAVE_IMAGES_FREQ = 100
 
 parser = argparse.ArgumentParser()
 # DIRECTORIES
@@ -19,28 +24,23 @@ parser.add_argument('--out_dir', type=str, default='w_gan_out/',
                     help='Directory to where images and models will be saved')
 
 # MODEL PARAMS
-parser.add_argument('--model_version', type=str, default=VERSION,
-                    help='Used for folders')
+parser.add_argument('--num_epochs', type=int, default=DEFAULT_TRAIN_NUM_EPOCHS)
+parser.add_argument('--batch_size', type=int, default=DEFAULT_TRAIN_BATCH_SIZE)
+parser.add_argument('--model_version', type=str, default=VERSION)
+parser.add_argument('--print_freq', type=int, default=DEFAULT_PRINT_FREQ)
+parser.add_argument('--save_model_freq', type=int, default=DEFAULT_SAVE_MODEL_FREQ)
+parser.add_argument('--save_images_freq', type=int, default=DEFAULT_SAVE_IMAGES_FREQ)
 FLAGS = parser.parse_args()
 
 OUTPUT_MODEL_PATH = FLAGS.out_dir + 'model/' + FLAGS.model_version
 OUTPUT_IMAGES_PATH = FLAGS.out_dir + 'images/' + FLAGS.model_version
 OUTPUT_IMAGE_COLUMNS = 8
 
-DEBUG_PRINT_FREQ = 50
-SAVE_MODEL_FREQ = 500
-SAVE_IMAGES_FREQ = 100
-
-# 100 RANDOM NUMBERS
-GEN_INPUT_DIM = 100
-# 128 X 128 AND RGB (3)
-# ^ size of generator output & the images that will be coming in will be resized to that
-HEIGHT, WIDTH, CHANNEL = 128, 128, 3
-
-TRAIN_BATCH_SIZE = 8
-TRAIN_NUM_EPOCHS = 1
-TRAIN_DISC_PER_BATCH = 1
+TRAIN_DISC_PER_BATCH = 5
 TRAIN_GEN_PER_BATCH = 1
+
+GEN_INPUT_DIM = 100
+HEIGHT, WIDTH, CHANNEL = 128, 128, 3
 
 
 def create_dirs_if_not_exists(path):
@@ -49,7 +49,7 @@ def create_dirs_if_not_exists(path):
 
 
 def get_train_noise():
-    return np.random.uniform(-1.0, 1.0, size=[TRAIN_BATCH_SIZE, GEN_INPUT_DIM]).astype(np.float32)
+    return np.random.uniform(-1.0, 1.0, size=[FLAGS.batch_size, GEN_INPUT_DIM]).astype(np.float32)
 
 
 def save_model(saver, sess, epoch_counter):
@@ -94,9 +94,9 @@ def train():
     # clip discriminator weights
     d_clip = [v.assign(tf.clip_by_value(v, -0.01, 0.01)) for v in d_vars]
 
-    image_batch, samples_num = trainer.get_training_image_batch(HEIGHT, WIDTH, TRAIN_BATCH_SIZE,
+    image_batch, samples_num = trainer.get_training_image_batch(HEIGHT, WIDTH, FLAGS.batch_size,
                                                                 data_dir=FLAGS.data_dir)
-    batch_num = int(samples_num / TRAIN_BATCH_SIZE)
+    batch_num = int(samples_num / FLAGS.batch_size)
 
     # sess init
     sess = tf.Session()
@@ -112,7 +112,7 @@ def train():
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     print('Training samples:{}'.format(samples_num))
-    for epoch_counter in range(TRAIN_NUM_EPOCHS):
+    for epoch_counter in range(FLAGS.num_epochs):
         print("epoch: {}".format(epoch_counter))
 
         # BATCH TRAINING
@@ -136,15 +136,15 @@ def train():
                                     feed_dict={random_input: train_noise, is_train: True})
 
             # print debug stuff every now and then
-            if (epoch_counter % DEBUG_PRINT_FREQ == 0):
+            if (epoch_counter % FLAGS.print_freq == 0):
                 print('train:[%d],d_loss:%f,g_loss:%f' % (epoch_counter, dLoss, gLoss))
 
         # save images every now and then
-        if epoch_counter % SAVE_IMAGES_FREQ == 0:
+        if epoch_counter % FLAGS.save_images_freq == 0:
             save_images(sess, fake_image, random_input, is_train, epoch_counter)
 
         # save model every now and then
-        if epoch_counter % SAVE_MODEL_FREQ == 0:
+        if epoch_counter % FLAGS.save_model_freq == 0:
             save_model(saver, sess, epoch_counter)
 
     coord.request_stop()
