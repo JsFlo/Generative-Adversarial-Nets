@@ -9,9 +9,7 @@ Different GAN ([Generative Adversarial Network](http://papers.nips.cc/paper/5423
 ![](images/digi_gan_2.jpg)
 
 ### Trained on the original 150 Pokemon:
-![](images/poke_example_1.jpg)
-
-![](images/poke_example_2.jpg)
+![](images/poke_example.jpg)
 
 ## GAN (*/vaniall_gan/*)
 A Generative Adversarial Net implemented with **TensorFlow** using the
