@@ -43,10 +43,28 @@ Once you have a checkpoint (model output) then you can continue to pull images f
 
 Simple usage: `python3 inference.py --model_path=w_gan_out/model/DEBUG/model0.chkpt`
 
-TODO: I'll include some model checkpoints that I've trained here:
+### Model checkpoint based on Digimon
+ https://files.fm/u/k55255q4
 
-In this case theres a checkpoint `model0.chkpt` even though there's not a file named `model0.chkpt` it is made up of 3 files `[CHECKPOINT_NAME].data-00000-of-00001`, `[CHECKPOINT_NAME].index`, `[CHECKPOINT_NAME].meta`.
+```
+  digi1000
+├── digi1000.chkpt.data-00000-of-00001
+├── digi1000.chkpt.index
+└── digi1000.chkpt.meta
 
+python3 inference.py --model_path=digi1000/digi1000.chkpt
+```
+### Model checkpoint based on 150 Pokemon
+https://files.fm/u/z77ddrrr
+```
+poke5500
+├── poke5500.chkpt.data-00000-of-00001
+├── poke5500.chkpt.index
+└── poke5500.chkpt.meta
+ python3 inference.py --model_path=poke5500/poke5500.chkpt
+ ```
+
+### Example from w_gan output
 ```
 └── model
     └── DEBUG
@@ -55,6 +73,8 @@ In this case theres a checkpoint `model0.chkpt` even though there's not a file n
         ├── model0.chkpt.index
         └── model0.chkpt.meta
 ```
+
+In this case theres a checkpoint `model0.chkpt` even though there's not a file named `model0.chkpt` it is made up of 3 files `[CHECKPOINT_NAME].data-00000-of-00001`, `[CHECKPOINT_NAME].index`, `[CHECKPOINT_NAME].meta`.
 
 ## arg Params
 * `model_path` - where is the model (and include chkpt name like above)
