@@ -18,7 +18,7 @@ DEFAULT_SAVE_IMAGES_FREQ = 100
 
 parser = argparse.ArgumentParser()
 # DIRECTORIES
-parser.add_argument('--data_dir', type=str, default='data/',
+parser.add_argument('--data_dir', type=str, required=True,
                     help='Path to images.')
 parser.add_argument('--out_dir', type=str, default='w_gan_out/',
                     help='Directory to where images and models will be saved')

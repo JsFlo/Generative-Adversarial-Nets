@@ -7,7 +7,7 @@ import utils
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model_path', type=str, default='./models/1000',
+parser.add_argument('--model_path', type=str, required=True,
                     help='Path to model checkpoint.')
 parser.add_argument('--output_path', type=str, default='./inf_out/images/',
                     help='Path to model checkpoint.')
