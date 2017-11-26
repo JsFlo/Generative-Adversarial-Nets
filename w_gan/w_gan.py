@@ -10,7 +10,7 @@ import trainer
 import utils
 
 VERSION = 'DEBUG'
-DEFAULT_TRAIN_NUM_EPOCHS = 1001
+DEFAULT_TRAIN_NUM_EPOCHS = 1000
 DEFAULT_TRAIN_BATCH_SIZE = 64
 DEFAULT_PRINT_FREQ = 50
 DEFAULT_SAVE_MODEL_FREQ = 500
@@ -112,7 +112,7 @@ def train():
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
     print('Training samples:{}'.format(samples_num))
-    for epoch_counter in range(FLAGS.num_epochs):
+    for epoch_counter in range(FLAGS.num_epochs + 1):
         print("epoch: {}".format(epoch_counter))
 
         # BATCH TRAINING
