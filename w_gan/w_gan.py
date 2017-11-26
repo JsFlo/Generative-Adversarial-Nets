@@ -54,7 +54,7 @@ def get_train_noise():
 
 def save_model(saver, sess, epoch_counter):
     create_dirs_if_not_exists(OUTPUT_MODEL_PATH)
-    fileName = OUTPUT_MODEL_PATH + '/' + str(epoch_counter)
+    fileName = OUTPUT_MODEL_PATH + '/model' + str(epoch_counter) + '.chkpt'
     saver.save(sess, fileName)
 
 

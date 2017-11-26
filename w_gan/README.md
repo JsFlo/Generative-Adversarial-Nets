@@ -25,4 +25,39 @@ Simple usage:
 During **training** the script frequently saves **sample images** and **model checkpoints**.
 You can use the **model checkpoints** to run **inference** later.
 
+```
+w_gan_out/
+├── images
+│   └── DEBUG
+│       └── epoch0.jpg
+└── model
+    └── DEBUG
+        ├── checkpoint
+        ├── model0.chkpt.data-00000-of-00001
+        ├── model0.chkpt.index
+        └── model0.chkpt.meta
+```
 # Inference
+
+Once you have a checkpoint (model output) then you can continue to pull images from the model using the `inference.py` script.
+
+Simple usage: `python3 inference.py --model_path=w_gan_out/model/DEBUG/model0.chkpt`
+
+TODO: I'll include some model checkpoints that I've trained here:
+
+In this case theres a checkpoint `model0.chkpt` even though there's not a file named `model0.chkpt` it is made up of 3 files `[CHECKPOINT_NAME].data-00000-of-00001`, `[CHECKPOINT_NAME].index`, `[CHECKPOINT_NAME].meta`.
+
+```
+└── model
+    └── DEBUG
+        ├── checkpoint
+        ├── model0.chkpt.data-00000-of-00001
+        ├── model0.chkpt.index
+        └── model0.chkpt.meta
+```
+
+## arg Params
+* `model_path` - where is the model (and include chkpt name like above)
+* `output_path` - where to put output images
+* `output_image_columns` - image output format
+* `output_num_images` - image output format
