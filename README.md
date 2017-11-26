@@ -1,7 +1,13 @@
 # Generative-Adversarial-Nets
 Different GAN ([Generative Adversarial Network](http://papers.nips.cc/paper/5423-generative-adversarial-nets.pdf)) architectures in TensorFlow
 
-## convGAN
+## w gan (*./w_gan/*)
+
+![](images/digi_gan_1.jpg)
+
+![](images/digi_gan_2.jpg)
+
+## GAN (*/vaniall_gan/*)
 A Generative Adversarial Net implemented with **TensorFlow** using the
 **MNIST** data set.
 
@@ -9,7 +15,7 @@ A Generative Adversarial Net implemented with **TensorFlow** using the
 * Input: **100**
 * Output: **784**
 * Purpose: Will learn to **output images** that **look** like a **real**
-image from **random input**. 
+image from **random input**.
 
 
 
@@ -22,21 +28,21 @@ image from **random input**.
 #### Notes and Outputs
 A problem with the way that I built this is that I used the **same architecture**
 for **both** the **generator** and **discriminator**. Although I thought this save me, the developer, a lot of time it actually
-caused a lot of problems with trying to pigeonhole that architecture to work with a smaller input **(Discriminator: 28x28 vs 10x10 : Generator)**. 
+caused a lot of problems with trying to pigeonhole that architecture to work with a smaller input **(Discriminator: 28x28 vs 10x10 : Generator)**.
 
 ##### Architecture
 
-* conv1 -> relu -> pool -> 
+* conv1 -> relu -> pool ->
 * conv2 -> relu -> pool ->
 * conv3 -> relu -> pool ->
 * fullyConnected1 -> relu ->
-* fullyConnected2 -> relu -> 
+* fullyConnected2 -> relu ->
 * fullyConnected3 ->
 
 100 random numbers -> Generator -> ImageOutput -> Discriminator -> (Real|Fake)
 
 
-![generated gan output](images/gan_generated.gif) 
+![generated gan output](images/gan_generated.gif)
 
 ![](images/init.png)
 ![](images/two.png)
@@ -46,3 +52,4 @@ caused a lot of problems with trying to pigeonhole that architecture to work wit
 ![](images/weird2.png)
 ![](images/weird3.png)
 
+## ColorGan
