@@ -38,6 +38,12 @@ w_gan_out/
         └── model0.chkpt.meta
 ```
 # Inference
+```
+install python 3.x
+pip3 install --upgrade tensorflow
+pip3 install scipy
+pip3 install Pillow
+```
 
 Once you have a checkpoint (model output) then you can continue to pull images from the model using the `inference.py` script.
 
