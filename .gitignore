@@ -1,3 +1,8 @@
 .DS_Store
 .idea/
 __pycache__/
+dev-tmux
+vanilla_gan/MNIST_DATA/
+w_gan/inf_out/
+w_gan/models/
+w_gan/w_gan_out/
