@@ -58,8 +58,8 @@ def save_model(saver, sess, epoch_counter):
 
 def save_images(sess, fake_image, random_input, is_train, epoch_counter, cat_trainer):
     create_dirs_if_not_exists(OUTPUT_IMAGES_PATH)
-    sample_noise = cat_trainer.get_random(FLAGS.batch_size)
-    imgtest = sess.run(fake_image, feed_dict={random_input: sample_noise, is_train: False})
+    rows, images = cat_trainer.get_random(FLAGS.batch_size)
+    imgtest = sess.run(fake_image, feed_dict={random_input: rows, is_train: False})
     fileName = OUTPUT_IMAGES_PATH + '/epoch' + str(epoch_counter) + '.jpg'
     utils.save_images(imgtest, fileName, OUTPUT_IMAGE_COLUMNS)
 
@@ -135,7 +135,7 @@ def train():
 
         # save images every now and then
         if epoch_counter % FLAGS.save_images_freq == 0:
-            save_images(sess, fake_image, placeholder_input, is_train, epoch_counter)
+            save_images(sess, fake_image, placeholder_input, is_train, epoch_counter, cat_trainer)
 
         # save model every now and then
         if epoch_counter % FLAGS.save_model_freq == 0:
