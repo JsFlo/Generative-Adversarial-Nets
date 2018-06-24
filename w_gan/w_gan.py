@@ -114,12 +114,12 @@ def train():
         # BATCH TRAINING
         for batch in cat_trainer.iterate_minibatches(FLAGS.batch_size):
             features, images = batch
+            train_image = sess.run(images)
+
 
             # TRAIN DISCRIMINATOR
             for _ in range(TRAIN_DISC_PER_BATCH):
-                train_image = sess.run(images)
                 sess.run(d_clip)
-
                 # Update the discriminator
                 _, dLoss = sess.run([trainer_d, d_loss],
                                     feed_dict={placeholder_input: features, real_image: train_image, is_train: True})
