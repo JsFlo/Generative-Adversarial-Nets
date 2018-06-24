@@ -8,6 +8,8 @@ import discriminator
 import generator
 import trainer
 import utils
+import pandas as pd
+from cat_trainer import Trainer
 
 VERSION = 'DEBUG'
 DEFAULT_TRAIN_NUM_EPOCHS = 1000
@@ -18,9 +20,9 @@ DEFAULT_SAVE_IMAGES_FREQ = 100
 
 parser = argparse.ArgumentParser()
 # DIRECTORIES
-parser.add_argument('--data_dir', type=str, required=True,
-                    help='Path to images.')
-parser.add_argument('--out_dir', type=str, default='w_gan_out/',
+parser.add_argument('--dir', type=str, required=True)
+parser.add_argument('--csv', type=str, required=True)
+parser.add_argument('--out_dir', type=str, default='w_cat_gan_out/',
                     help='Directory to where images and models will be saved')
 
 # MODEL PARAMS
@@ -39,7 +41,7 @@ OUTPUT_IMAGE_COLUMNS = 8
 TRAIN_DISC_PER_BATCH = 5
 TRAIN_GEN_PER_BATCH = 1
 
-GEN_INPUT_DIM = 100
+INPUT_DIM = 18
 HEIGHT, WIDTH, CHANNEL = 128, 128, 3
 
 
@@ -48,32 +50,31 @@ def create_dirs_if_not_exists(path):
         os.makedirs(path)
 
 
-def get_train_noise():
-    return np.random.uniform(-1.0, 1.0, size=[FLAGS.batch_size, GEN_INPUT_DIM]).astype(np.float32)
-
-
 def save_model(saver, sess, epoch_counter):
     create_dirs_if_not_exists(OUTPUT_MODEL_PATH)
     fileName = OUTPUT_MODEL_PATH + '/model' + str(epoch_counter) + '.chkpt'
     saver.save(sess, fileName)
 
 
-def save_images(sess, fake_image, random_input, is_train, epoch_counter):
+def save_images(sess, fake_image, random_input, is_train, epoch_counter, cat_trainer):
     create_dirs_if_not_exists(OUTPUT_IMAGES_PATH)
-    sample_noise = get_train_noise()
+    sample_noise = cat_trainer.get_random(FLAGS.batch_size)
     imgtest = sess.run(fake_image, feed_dict={random_input: sample_noise, is_train: False})
     fileName = OUTPUT_IMAGES_PATH + '/epoch' + str(epoch_counter) + '.jpg'
     utils.save_images(imgtest, fileName, OUTPUT_IMAGE_COLUMNS)
 
 
 def train():
+    df = pd.read_csv(FLAGS.csv)
+    cat_trainer = Trainer(FLAGS.dir, df)
+
     # PLACEHOLDERS
     real_image = tf.placeholder(tf.float32, shape=[None, HEIGHT, WIDTH, CHANNEL], name='real_image')
-    random_input = tf.placeholder(tf.float32, shape=[None, GEN_INPUT_DIM], name='rand_input')
+    placeholder_input = tf.placeholder(tf.float32, shape=[None, INPUT_DIM], name='rand_input')
     is_train = tf.placeholder(tf.bool, name='is_train')
 
     # GENERATOR
-    fake_image = generator.get_generator(random_input, GEN_INPUT_DIM, output_dim=3, is_train=is_train)
+    fake_image = generator.get_generator(placeholder_input, INPUT_DIM, output_dim=3, is_train=is_train)
 
     # DISCRIMINATORS
     real_result = discriminator.get_discriminator(real_image, is_train)
@@ -94,10 +95,6 @@ def train():
     # clip discriminator weights
     d_clip = [v.assign(tf.clip_by_value(v, -0.01, 0.01)) for v in d_vars]
 
-    image_batch, samples_num = trainer.get_training_image_batch(HEIGHT, WIDTH, FLAGS.batch_size,
-                                                                data_dir=FLAGS.data_dir)
-    batch_num = int(samples_num / FLAGS.batch_size)
-
     # sess init
     sess = tf.Session()
     saver = tf.train.Saver()
@@ -111,29 +108,26 @@ def train():
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-    print('Training samples:{}'.format(samples_num))
     for epoch_counter in range(FLAGS.num_epochs + 1):
         print("epoch: {}".format(epoch_counter))
 
         # BATCH TRAINING
-        for batch_counter in range(batch_num):
-            # print("batch: {}".format(batch_counter))
-
-            # GET INPUT (100 RANDOM NOISE)
-            train_noise = get_train_noise()
+        for batch in cat_trainer.iterate_minibatches(FLAGS.batch_size):
+            features, images = batch
 
             # TRAIN DISCRIMINATOR
             for _ in range(TRAIN_DISC_PER_BATCH):
-                train_image = sess.run(image_batch)
+                train_image = sess.run(images)
                 sess.run(d_clip)
 
                 # Update the discriminator
                 _, dLoss = sess.run([trainer_d, d_loss],
-                                    feed_dict={random_input: train_noise, real_image: train_image, is_train: True})
+                                    feed_dict={placeholder_input: features, real_image: train_image, is_train: True})
+
             # TRAIN GENERATOR
             for _ in range(TRAIN_GEN_PER_BATCH):
                 _, gLoss = sess.run([trainer_g, g_loss],
-                                    feed_dict={random_input: train_noise, is_train: True})
+                                    feed_dict={placeholder_input: features, is_train: True})
 
             # print debug stuff every now and then
             if (epoch_counter % FLAGS.print_freq == 0):
@@ -141,7 +135,7 @@ def train():
 
         # save images every now and then
         if epoch_counter % FLAGS.save_images_freq == 0:
-            save_images(sess, fake_image, random_input, is_train, epoch_counter)
+            save_images(sess, fake_image, placeholder_input, is_train, epoch_counter)
 
         # save model every now and then
         if epoch_counter % FLAGS.save_model_freq == 0:
