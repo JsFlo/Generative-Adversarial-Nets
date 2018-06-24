@@ -11,6 +11,31 @@ Different GAN ([Generative Adversarial Network](http://papers.nips.cc/paper/5423
 ### Trained on the original 150 Pokemon:
 ![](images/poke_example.jpg)
 
+### Wasserstein GAN
+https://arxiv.org/abs/1701.07875
+
+### Generator
+tf.layers.conv2d_transpose
+tf.contrib.layers.batch_norm
+### Discriminator
+tf.layers.conv2d
+tf.contrib.layers.batch_norm
+
+def leaky_relu(input, name, leak=0.2):
+    return tf.maximum(input, leak * input, name=name)
+
+w- gan
+
+
+
+
+
+
+
+
+
+
+
 ## GAN (*/vaniall_gan/*)
 A Generative Adversarial Net implemented with **TensorFlow** using the
 **MNIST** data set.
