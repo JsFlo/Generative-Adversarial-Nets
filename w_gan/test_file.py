@@ -42,7 +42,7 @@ def get_rows(filename, batch_size):
                 input_batch = []
 
 counter = 0
-for features, image_label in get_rows(FLAGS.csv, FLAGS.batch_size):
+for features, image_label in get_rows(FLAGS.csv, 64):
     counter +=1
     print(counter)
     print(len(features))
