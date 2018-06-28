@@ -21,6 +21,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--csv', type=str, required=True)
 FLAGS = parser.parse_args()
 
+csv.field_size_limit(sys.maxsize)
 def get_rows(filename, batch_size):
     with open(filename, "r") as csvfile:
         datareader = csv.reader(csvfile)
