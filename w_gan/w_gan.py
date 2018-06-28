@@ -62,7 +62,7 @@ def save_model(saver, sess, epoch_counter):
 
 def save_images(sess, fake_image, random_input, is_train, epoch_counter):
     create_dirs_if_not_exists(OUTPUT_IMAGES_PATH)
-    rows_gen = get_rows(FLAGS.csv)
+    rows_gen = get_training_rows(FLAGS.csv)
     rows_start_idx = randint(0, 800)
     rand_input = np.array(list(itertools.islice(rows_gen, rows_start_idx, rows_start_idx + OUTPUT_IMAGE_COLUMNS)))
     imgtest = sess.run(fake_image, feed_dict={random_input: rand_input, is_train: False})
@@ -73,7 +73,27 @@ def save_images(sess, fake_image, random_input, is_train, epoch_counter):
 csv.field_size_limit(sys.maxsize)
 
 
-def get_rows(filename):
+def get_rows(filename, batch_size):
+    with open(filename, "r") as csvfile:
+        datareader = csv.reader(csvfile)
+        count = 0
+        image_batch = []
+        input_batch = []
+        for row in datareader:
+            input = np.array(row[2:20]).astype(np.float)
+            image_label = np.array(ast.literal_eval(row[20]))
+
+            image_batch.append(image_label)
+            input_batch.append(input)
+            count += 1
+
+            if (count >= batch_size):
+                yield input_batch, image_batch
+                count = 0
+                image_batch = []
+                input_batch = []
+
+def get_training_rows(filename):
     with open(filename, "r") as csvfile:
         datareader = csv.reader(csvfile)
         for row in datareader:
@@ -130,7 +150,7 @@ def train():
         print("epoch: {}".format(epoch_counter))
 
         # BATCH TRAINING
-        for features, image_label in get_rows(FLAGS.csv):
+        for features, image_label in get_rows(FLAGS.csv, FLAGS.batch_size):
 
             # TRAIN DISCRIMINATOR
             for _ in range(TRAIN_DISC_PER_BATCH):
